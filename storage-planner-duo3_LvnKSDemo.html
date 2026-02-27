@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self-Storage Business Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:      #58CC02;
+  --green-dark: #46A302;
+  --green-deep: #2A6B00;
+  --green-bg:   #F0FDE4;
+  --green-pale: #E0F8C8;
+  --white:      #FFFFFF;
+  --off-white:  #F7F7F7;
+  --border:     #E5E5E5;
+  --border-dark:#C8C8C8;
+  --text:       #1C1C1C;
+  --muted:      #777777;
+  --muted2:     #AFAFAF;
+  --blue:       #1CB0F6;
+  --blue-dark:  #0E8FC0;
+  --blue-pale:  #DFF4FF;
+  --gold:       #FF9600;
+  --gold-dark:  #CC7700;
+  --gold-pale:  #FFF5E0;
+  --red:        #FF4B4B;
+  --red-pale:   #FFE8E8;
+  --purple:     #CE82FF;
+  --purple-pale:#F5E8FF;
+  --shadow-btn: 0 4px 0 var(--green-dark);
+  --shadow-card:0 2px 0 var(--border-dark);
+  --radius-lg:  16px;
+  --radius-md:  12px;
+  --radius-sm:  8px;
+  --radius-pill:100px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--off-white);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===================== LOGO ANIMATION ===================== */
+/* Car → Building → Money animated SVG */
+@keyframes carDrive {
+  0%   { transform: translateX(-80px); opacity:0; }
+  15%  { opacity:1; }
+  40%  { transform: translateX(0px); opacity:1; }
+  55%  { transform: translateX(0px) scale(0.8); opacity:0.7; }
+  70%  { transform: translateX(0px) scale(0); opacity:0; }
+  100% { transform: translateX(0px) scale(0); opacity:0; }
+}
+@keyframes buildingAppear {
+  0%,45%{ opacity:0; transform:scale(0.5); }
+  60%   { opacity:1; transform:scale(1.15); }
+  75%   { transform:scale(1); opacity:1; }
+  85%   { opacity:1; }
+  95%   { opacity:0; transform:scale(0.8); }
+  100%  { opacity:0; }
+}
+@keyframes moneyAppear {
+  0%,80% { opacity:0; transform:scale(0) rotate(-20deg); }
+  90%    { opacity:1; transform:scale(1.2) rotate(5deg); }
+  95%    { transform:scale(0.95) rotate(-2deg); }
+  100%   { opacity:1; transform:scale(1) rotate(0deg); }
+}
+@keyframes coinSpin {
+  0%  { transform:rotateY(0deg); }
+  100%{ transform:rotateY(360deg); }
+}
+@keyframes bounce {
+  0%,100%{ transform:translateY(0); }
+  50%    { transform:translateY(-3px); }
+}
+@keyframes wiggle {
+  0%,100%{ transform:rotate(0deg); }
+  25%    { transform:rotate(-8deg); }
+  75%    { transform:rotate(8deg); }
+}
+@keyframes sparkle {
+  0%,100%{ opacity:0; transform:scale(0); }
+  50%    { opacity:1; transform:scale(1); }
+}
+
+.logo-anim-wrap {
+  width: 56px; height: 56px;
+  position: relative;
+  flex-shrink: 0;
+}
+.logo-anim-wrap svg {
+  position: absolute; top:0; left:0;
+  width:100%; height:100%;
+}
+.car-svg    { animation: carDrive 3.6s ease-in-out infinite; }
+.build-svg  { animation: buildingAppear 3.6s ease-in-out infinite; }
+.money-svg  { animation: moneyAppear 3.6s ease-in-out infinite; }
+.money-svg .coin { animation: coinSpin 0.6s linear infinite; transform-origin:center; }
+
+/* ===================== HEADER ===================== */
+.header {
+  background: var(--white);
+  border-bottom: 2px solid var(--border);
+  padding: 0 32px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top:0; z-index:200;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.logo-block { display:flex; align-items:center; gap:14px; text-decoration:none; }
+.logo-text  { display:flex; flex-direction:column; gap:0; }
+.logo-name  {
+  font-size: 22px; font-weight:900; color:var(--text);
+  letter-spacing: -0.5px; line-height:1.1;
+}
+.logo-name span { color:var(--green); }
+.logo-tag   { font-size: 11px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; }
+
+.header-right { display:flex; align-items:center; gap:12px; }
+
+/* XP streak badge - Duolingo style */
+.xp-badge {
+  display:flex; align-items:center; gap:6px;
+  background:var(--gold-pale); border:2px solid var(--gold);
+  border-radius:var(--radius-pill); padding:6px 14px;
+  font-weight:800; font-size:14px; color:var(--gold-dark);
+  animation: bounce 2s ease-in-out infinite;
+}
+.streak-badge {
+  display:flex; align-items:center; gap:6px;
+  background:var(--green-bg); border:2px solid var(--green);
+  border-radius:var(--radius-pill); padding:6px 14px;
+  font-weight:800; font-size:14px; color:var(--green-dark);
+}
+
+/* ===================== STEPPER (Duolingo path style) ===================== */
+.stepper-wrap {
+  background: var(--white);
+  border-bottom: 2px solid var(--border);
+  padding: 0 32px;
+}
+
+.stepper {
+  display:flex; align-items:stretch;
+  max-width: 1200px; margin: 0 auto;
+}
+
+.step {
+  flex:1; display:flex; align-items:center; gap:10px;
+  padding: 16px 12px 12px;
+  cursor:pointer;
+  border-bottom: 4px solid transparent;
+  transition: all 0.2s;
+  position: relative;
+}
+.step:hover:not(.locked) { background:var(--green-bg); }
+.step.active { border-bottom-color: var(--green); }
+.step.locked { opacity:0.4; cursor:not-allowed; }
+
+.step-bubble {
+  width:36px; height:36px; border-radius:50%;
+  border:3px solid var(--border-dark);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:15px; color:var(--muted);
+  flex-shrink:0; transition:all 0.2s; background:var(--white);
+}
+.step.active .step-bubble {
+  border-color:var(--green); background:var(--green); color:white;
+  box-shadow: 0 3px 0 var(--green-dark);
+  animation: bounce 1.5s ease-in-out infinite;
+}
+.step.done .step-bubble { border-color:var(--green); background:var(--green); color:white; }
+.step-info { display:flex; flex-direction:column; gap:1px; }
+.step-name { font-weight:800; font-size:13px; color:var(--muted); }
+.step.active .step-name { color:var(--green-dark); }
+.step.done  .step-name { color:var(--text); }
+.step-desc  { font-size:10px; color:var(--muted2); font-weight:600; letter-spacing:0.5px; text-transform:uppercase; }
+
+/* ===================== MAIN ===================== */
+.main { max-width:1100px; margin:0 auto; padding:36px 32px 100px; }
+
+/* ===================== CARD (Duolingo card style) ===================== */
+.card {
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s;
+}
+.card:hover { box-shadow: 0 4px 0 var(--border-dark); }
+
+.card-header {
+  padding: 20px 28px 16px;
+  border-bottom: 2px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  background: var(--white);
+}
+.card-title {
+  font-size:20px; font-weight:900; color:var(--text);
+  display:flex; align-items:center; gap:10px;
+}
+.card-title .chip {
+  font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase;
+  background:var(--green-bg); color:var(--green-dark);
+  border:2px solid var(--green-pale); border-radius:var(--radius-pill);
+  padding:3px 10px;
+}
+.card-body { padding:28px; }
+
+/* ===================== SECTION HEADER ===================== */
+.section-head {
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:18px;
+}
+.section-head-line {
+  font-size:13px; font-weight:900; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px;
+  white-space:nowrap;
+}
+.section-head::after {
+  content:''; flex:1; height:2px; background:var(--border); border-radius:2px;
+}
+
+/* ===================== FORM ELEMENTS ===================== */
+.form-grid { display:grid; gap:16px; }
+.grid-2 { grid-template-columns:repeat(2,1fr); }
+.grid-3 { grid-template-columns:repeat(3,1fr); }
+.grid-4 { grid-template-columns:repeat(4,1fr); }
+.col-2  { grid-column:span 2; }
+.col-3  { grid-column:span 3; }
+
+.form-group { display:flex; flex-direction:column; gap:7px; }
+
+.form-label {
+  font-size:13px; font-weight:800; color:var(--text);
+  display:flex; align-items:center; gap:6px;
+}
+.form-label .opt { font-weight:600; color:var(--muted2); font-size:11px; }
+
+.form-input, .form-select {
+  background:var(--white);
+  border:2px solid var(--border-dark);
+  border-radius:var(--radius-md);
+  color:var(--text);
+  padding:12px 16px;
+  font-family:'Nunito',sans-serif;
+  font-size:15px; font-weight:600;
+  outline:none;
+  transition:border-color 0.15s, box-shadow 0.15s;
+  width:100%;
+  box-shadow: 0 2px 0 var(--border);
+}
+.form-input:focus, .form-select:focus {
+  border-color:var(--blue);
+  box-shadow: 0 2px 0 var(--blue-dark), 0 0 0 3px rgba(28,176,246,0.15);
+}
+.form-input::placeholder { color:var(--muted2); font-weight:600; }
+
+.input-pfx { position:relative; }
+.pfx-sym {
+  position:absolute; left:14px; top:50%; transform:translateY(-50%);
+  font-weight:800; color:var(--muted); font-size:16px; pointer-events:none;
+}
+.pfx-sym + .form-input { padding-left:28px; }
+
+/* ===================== RANGE ===================== */
+.range-group { display:flex; flex-direction:column; gap:8px; }
+.range-vals  { display:flex; justify-content:space-between; align-items:center; }
+.range-cur   { font-size:22px; font-weight:900; color:var(--green); }
+.range-ends  { font-size:12px; font-weight:700; color:var(--muted2); }
+input[type="range"] {
+  width:100%; accent-color:var(--green);
+  height:6px; border-radius:3px; background:var(--border); cursor:pointer;
+}
+
+/* ===================== CREDIT SCORE ===================== */
+.score-card {
+  background:var(--off-white); border:2px solid var(--border);
+  border-radius:var(--radius-md); padding:16px; display:flex; flex-direction:column; gap:8px;
+}
+.score-num  { font-size:36px; font-weight:900; color:var(--green); line-height:1; }
+.score-lbl  { font-size:13px; font-weight:700; color:var(--muted); }
+.score-track{ height:10px; background:var(--border); border-radius:5px; overflow:hidden; }
+.score-fill {
+  height:100%; border-radius:5px; transition:width 0.5s ease;
+  background:linear-gradient(90deg, #FF4B4B 0%, #FF9600 30%, #58CC02 60%, #1CB0F6 100%);
+  clip-path:inset(0 calc(100% - var(--pct)) 0 0);
+}
+.score-ticks{ display:flex; justify-content:space-between; font-size:9px; font-weight:700; color:var(--muted2); }
+
+/* ===================== FIN SUMMARY ===================== */
+.fin-row {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:1px; background:var(--border);
+  border:2px solid var(--border); border-radius:var(--radius-md); overflow:hidden; margin-top:16px;
+}
+.fin-cell { background:var(--white); padding:14px 16px; }
+.fin-lbl  { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--muted2); margin-bottom:4px; }
+.fin-val  { font-size:22px; font-weight:900; color:var(--green); }
+.fin-sub  { font-size:11px; font-weight:600; color:var(--muted2); margin-top:2px; }
+
+/* ===================== SCALE CARDS ===================== */
+.scale-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+
+.scale-card {
+  background:var(--white); border:3px solid var(--border);
+  border-radius:var(--radius-lg); padding:18px 14px; cursor:pointer;
+  transition:all 0.15s; display:flex; flex-direction:column; gap:7px;
+  box-shadow: 0 3px 0 var(--border); position:relative; overflow:hidden;
+}
+.scale-card:hover { border-color:var(--green); transform:translateY(-2px); box-shadow:0 5px 0 var(--green-dark); }
+.scale-card.sel {
+  border-color:var(--green); background:var(--green-bg);
+  box-shadow:0 4px 0 var(--green-dark);
+}
+.scale-card.sel::after {
+  content:'✓'; position:absolute; top:10px; right:12px;
+  width:22px; height:22px; background:var(--green); color:white;
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:900; line-height:22px; text-align:center;
+}
+.sc-icon { font-size:30px; }
+.sc-name { font-size:16px; font-weight:900; color:var(--text); }
+.sc-range{ font-size:12px; font-weight:700; color:var(--green-dark); }
+.sc-desc { font-size:12px; font-weight:600; color:var(--muted); line-height:1.4; }
+
+/* ===================== TOGGLE ===================== */
+.toggle-row { display:flex; align-items:center; gap:12px; }
+.toggle {
+  width:48px; height:28px; background:var(--border-dark);
+  border-radius:14px; cursor:pointer; position:relative; transition:background 0.2s;
+  border:2px solid var(--border-dark); flex-shrink:0;
+}
+.toggle.on { background:var(--green); border-color:var(--green-dark); }
+.toggle::after {
+  content:''; position:absolute; left:2px; top:2px;
+  width:20px; height:20px; background:white; border-radius:50%;
+  box-shadow:0 2px 4px rgba(0,0,0,0.2); transition:left 0.2s;
+}
+.toggle.on::after { left:22px; }
+.toggle-label { font-size:15px; font-weight:700; }
+
+/* ===================== PHASE ===================== */
+.phase-list { border:2px solid var(--border); border-radius:var(--radius-md); overflow:hidden; }
+.phase-row  {
+  display:flex; align-items:center; gap:14px; padding:14px 18px;
+  border-bottom:1px solid var(--border); transition:background 0.15s;
+}
+.phase-row:last-child { border-bottom:none; }
+.phase-row.active { background:var(--green-bg); }
+.phase-dot  {
+  width:32px; height:32px; border-radius:50%; background:var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:15px; color:var(--muted); flex-shrink:0;
+}
+.phase-row.active .phase-dot { background:var(--green); color:white; box-shadow:0 3px 0 var(--green-dark); }
+.phase-info  { flex:1; }
+.phase-title { font-size:14px; font-weight:800; }
+.phase-desc  { font-size:12px; font-weight:600; color:var(--muted); margin-top:2px; }
+
+/* ===================== CHECKBOXES ===================== */
+.cb-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+
+.cb-item {
+  display:flex; align-items:center; gap:10px;
+  background:var(--white); border:2px solid var(--border);
+  border-radius:var(--radius-md); padding:12px 14px; cursor:pointer;
+  transition:all 0.15s; user-select:none;
+  box-shadow:0 2px 0 var(--border);
+}
+.cb-item:hover { border-color:var(--green); transform:translateY(-1px); }
+.cb-item.on { border-color:var(--green); background:var(--green-bg); box-shadow:0 2px 0 var(--green-dark); }
+
+.cb-box {
+  width:22px; height:22px; border:3px solid var(--border-dark); border-radius:6px;
+  flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:900; color:transparent; transition:all 0.15s;
+}
+.cb-item.on .cb-box { border-color:var(--green); background:var(--green); color:white; }
+.cb-txt  { font-size:13px; font-weight:800; color:var(--text); line-height:1.3; }
+.cb-sub  { font-size:11px; font-weight:600; color:var(--muted2); margin-top:1px; }
+
+/* ===================== RADIUS VISUAL ===================== */
+.zip-grid { display:grid; grid-template-columns:1fr 2fr; gap:24px; align-items:start; }
+.radius-box {
+  position:relative; background:var(--green-bg);
+  border:2px solid var(--green-pale); border-radius:var(--radius-md);
+  height:160px; display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.r-ring { position:absolute; border-radius:50%; border:2px dashed rgba(88,204,2,0.3); }
+.r-dot  { width:12px; height:12px; background:var(--green); border-radius:50%; box-shadow:0 0 0 4px rgba(88,204,2,0.2); z-index:2; }
+.r-label{ position:absolute; bottom:8px; right:10px; font-size:12px; font-weight:800; color:var(--green-dark); }
+
+/* ===================== BANNERS ===================== */
+.banner {
+  display:flex; align-items:flex-start; gap:12px;
+  border-radius:var(--radius-md); padding:14px 18px; margin-bottom:18px;
+  font-size:13px; font-weight:600; line-height:1.6;
+}
+.banner-info    { background:var(--blue-pale); border:2px solid #AADBF5; color:#0B6E9B; }
+.banner-warning { background:#FFF8E0; border:2px solid #FFD966; color:#7A5E00; }
+.banner-green   { background:var(--green-bg); border:2px solid var(--green-pale); color:var(--green-deep); }
+.banner-icon    { font-size:20px; flex-shrink:0; margin-top:1px; }
+
+/* ===================== REVIEW SECTIONS ===================== */
+.review-block { border:2px solid var(--border); border-radius:var(--radius-md); overflow:hidden; margin-bottom:16px; box-shadow:0 2px 0 var(--border); }
+.review-hd    { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:1px solid var(--border); background:var(--off-white); }
+.review-title { font-size:14px; font-weight:900; text-transform:uppercase; letter-spacing:1px; color:var(--muted); }
+.review-bd    { padding:18px 20px; }
+.review-grid  { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.rv-item      { display:flex; flex-direction:column; gap:3px; }
+.rv-key       { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--muted2); }
+.rv-val       { font-size:14px; font-weight:800; color:var(--text); }
+.rv-val.money { color:var(--green-dark); font-size:16px; }
+.rv-val.na    { color:var(--muted2); font-weight:600; font-style:italic; font-size:12px; }
+.rv-val.big   { font-size:26px; color:var(--green); }
+.tag-row      { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+.tag {
+  font-size:12px; font-weight:700; padding:4px 10px; border-radius:var(--radius-pill);
+  border:2px solid var(--green-pale); background:var(--green-bg); color:var(--green-dark);
+}
+.tag.blue   { background:var(--blue-pale); border-color:#AADBF5; color:#0B6E9B; }
+.tag.purple { background:var(--purple-pale); border-color:#D9AAFF; color:#7730AA; }
+
+/* ===================== BUTTONS ===================== */
+.btn {
+  font-family:'Nunito',sans-serif;
+  font-size:15px; font-weight:900; letter-spacing:0.5px;
+  padding:13px 28px; border-radius:var(--radius-pill);
+  border:2px solid transparent; cursor:pointer;
+  transition:all 0.1s; display:inline-flex; align-items:center; gap:8px;
+  text-decoration:none;
+}
+.btn:active { transform:translateY(2px); }
+
+.btn-primary {
+  background:var(--green); color:white;
+  border-color:var(--green-dark);
+  box-shadow: var(--shadow-btn);
+}
+.btn-primary:hover { background:var(--green-dark); }
+.btn-primary:active { box-shadow:none; }
+
+.btn-secondary {
+  background:var(--white); color:var(--text);
+  border-color:var(--border-dark);
+  box-shadow: 0 4px 0 var(--border-dark);
+}
+.btn-secondary:hover { background:var(--off-white); }
+.btn-secondary:active { box-shadow:none; }
+
+.btn-blue {
+  background:var(--blue); color:white;
+  border-color:var(--blue-dark);
+  box-shadow: 0 4px 0 var(--blue-dark);
+}
+.btn-blue:hover { background:var(--blue-dark); }
+.btn-blue:active { box-shadow:none; }
+
+.btn-ghost {
+  background:transparent; color:var(--muted);
+  border-color:var(--border-dark);
+}
+.btn-ghost:hover { background:var(--off-white); color:var(--text); }
+
+.btn-danger {
+  background:var(--red-pale); color:var(--red);
+  border-color:#FFAAAA;
+  box-shadow: 0 4px 0 #FFAAAA;
+}
+
+.btn-row { display:flex; justify-content:flex-end; gap:12px; padding-top:22px; border-top:2px solid var(--border); margin-top:24px; }
+
+/* ===================== PROGRESS / SCAN ===================== */
+.scan-progress {
+  background:var(--green-bg); border:2px solid var(--green-pale);
+  border-radius:var(--radius-lg); padding:22px 26px; margin-bottom:20px;
+}
+.scan-title { font-size:18px; font-weight:900; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+.progress-track { height:12px; background:var(--border); border-radius:6px; overflow:hidden; margin-bottom:12px; }
+.progress-fill  { height:100%; border-radius:6px; transition:width 0.5s ease; background:var(--green); }
+.scan-status    { font-size:13px; font-weight:700; color:var(--green-dark); }
+
+.scan-list { display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+.scan-row  { display:flex; align-items:center; gap:10px; font-size:14px; font-weight:600; color:var(--muted); }
+.scan-dot  { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.scan-dot.done    { background:var(--green); }
+.scan-dot.running {
+  background:var(--green);
+  animation: pulse 0.8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100%{ box-shadow:0 0 0 0 rgba(88,204,2,0.5); }
+  50%    { box-shadow:0 0 0 5px rgba(88,204,2,0); }
+}
+.scan-dot.waiting { background:var(--border-dark); }
+.scan-row.done-row { color:var(--text); }
+
+/* ===================== DATA CARDS ===================== */
+.stat-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+
+.stat-card {
+  background:var(--white); border:2px solid var(--border);
+  border-radius:var(--radius-lg); padding:18px 20px;
+  box-shadow:0 3px 0 var(--border); transition:all 0.15s;
+}
+.stat-card:hover { transform:translateY(-2px); box-shadow:0 5px 0 var(--border-dark); }
+.stat-lbl  { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--muted2); margin-bottom:6px; }
+.stat-val  { font-size:32px; font-weight:900; color:var(--green); line-height:1; }
+.stat-sub  { font-size:12px; font-weight:600; color:var(--muted2); margin-top:4px; }
+.stat-icon { font-size:22px; float:right; opacity:0.3; margin-top:-28px; }
+
+/* ===================== TABLE ===================== */
+.tbl-wrap { overflow-x:auto; border:2px solid var(--border); border-radius:var(--radius-md); margin-bottom:24px; }
+table.tbl  { width:100%; border-collapse:collapse; font-size:12px; min-width:1400px; }
+table.tbl thead tr { background:var(--off-white); border-bottom:2px solid var(--border); }
+table.tbl thead th {
+  padding:10px 9px; text-align:left;
+  font-size:11px; font-weight:900; letter-spacing:1px; text-transform:uppercase; color:var(--muted);
+  border-right:1px solid var(--border); white-space:nowrap;
+}
+table.tbl thead th.grp {
+  text-align:center; background:var(--green-bg); color:var(--green-dark);
+  border-bottom:2px solid var(--green-pale);
+}
+table.tbl thead th:last-child { border-right:none; }
+table.tbl tbody tr { border-bottom:1px solid var(--border); transition:background 0.1s; }
+table.tbl tbody tr:hover { background:var(--off-white); }
+table.tbl tbody tr:last-child { border-bottom:none; }
+table.tbl tbody td { padding:12px 9px; border-right:1px solid var(--border); vertical-align:middle; }
+table.tbl tbody td:last-child { border-right:none; }
+
+.biz-name  { font-weight:900; font-size:13px; color:var(--text); line-height:1.2; }
+.biz-owner { font-size:11px; font-weight:700; color:var(--green-dark); margin-top:2px; }
+.biz-addr  { font-size:10px; font-weight:600; color:var(--muted2); margin-top:1px; }
+.biz-rating{ font-size:11px; font-weight:700; color:var(--gold-dark); margin-top:3px; }
+.price-cell{ font-size:12px; font-weight:800; color:var(--green-dark); text-align:center; }
+.price-cell.na { color:var(--muted2); font-size:10px; font-weight:600; text-align:center; }
+.val-cell  { font-size:12px; font-weight:700; color:var(--text); }
+.val-cell.lo{ color:var(--muted2); }
+
+.badge-pill {
+  display:inline-flex; align-items:center;
+  font-size:10px; font-weight:800; letter-spacing:0.5px; text-transform:uppercase;
+  padding:3px 8px; border-radius:var(--radius-pill); border:2px solid; white-space:nowrap;
+}
+.badge-pub  { color:var(--blue-dark); background:var(--blue-pale); border-color:#AADBF5; }
+.badge-priv { color:var(--green-dark); background:var(--green-bg); border-color:var(--green-pale); }
+.badge-govt { color:#7730AA; background:var(--purple-pale); border-color:#D9AAFF; }
+
+/* ===================== GAP ANALYSIS ===================== */
+.gap-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:16px; }
+
+.gap-card {
+  background:var(--white); border:2px solid var(--border);
+  border-radius:var(--radius-md); padding:16px;
+  box-shadow:0 2px 0 var(--border); transition:all 0.15s;
+}
+.gap-card:hover { transform:translateY(-1px); box-shadow:0 4px 0 var(--border-dark); }
+.gap-card.hot { border-color:var(--green); background:var(--green-bg); box-shadow:0 3px 0 var(--green-dark); }
+.gap-title { font-size:14px; font-weight:900; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; }
+.hot-chip  { background:var(--green); color:white; font-size:10px; font-weight:900; letter-spacing:1px; padding:2px 8px; border-radius:var(--radius-pill); }
+.gap-stat  { font-size:12px; font-weight:600; color:var(--muted); margin-bottom:3px; }
+.gap-stat b{ color:var(--text); font-weight:800; }
+.opp-track { height:6px; background:var(--border); border-radius:3px; overflow:hidden; margin-top:6px; }
+.opp-fill  { height:100%; border-radius:3px; }
+.opp-fill.hi  { background:var(--green); }
+.opp-fill.med { background:var(--gold); }
+.opp-fill.lo  { background:var(--red); }
+
+/* ===================== BROKERS / BUILDERS ===================== */
+.broker-tbl { width:100%; border-collapse:collapse; font-size:13px; }
+.broker-tbl th {
+  padding:10px 16px; background:var(--off-white); font-size:11px; font-weight:900;
+  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted);
+  text-align:left; border-bottom:2px solid var(--border);
+}
+.broker-tbl td { padding:13px 16px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.broker-tbl tr:last-child td { border-bottom:none; }
+.broker-tbl tr:hover td { background:var(--off-white); }
+.broker-name { font-weight:900; font-size:14px; }
+.broker-rate { font-weight:900; color:var(--green-dark); font-size:15px; }
+.broker-ph   { font-weight:800; color:var(--blue-dark); font-size:13px; }
+.broker-addr { font-size:11px; font-weight:600; color:var(--muted); margin-top:2px; }
+.usda-row td { background:rgba(88,204,2,0.04); }
+.usda-row:hover td { background:rgba(88,204,2,0.08) !important; }
+
+/* Builder cards */
+.builder-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
+.builder-card {
+  background:var(--white); border:2px solid var(--border);
+  border-radius:var(--radius-lg); overflow:hidden;
+  box-shadow:0 3px 0 var(--border); transition:all 0.15s;
+}
+.builder-card:hover { transform:translateY(-2px); box-shadow:0 5px 0 var(--border-dark); }
+.builder-card.top { border-color:var(--green); box-shadow:0 4px 0 var(--green-dark); }
+.bc-head {
+  padding:16px 18px; border-bottom:2px solid var(--border);
+  display:flex; align-items:flex-start; justify-content:space-between; gap:8px;
+}
+.bc-name { font-size:17px; font-weight:900; color:var(--text); }
+.bc-loc  { font-size:11px; font-weight:700; color:var(--muted2); margin-top:2px; }
+.rank-badge {
+  font-size:11px; font-weight:900; letter-spacing:0.5px; text-transform:uppercase;
+  padding:4px 10px; border-radius:var(--radius-pill); white-space:nowrap; flex-shrink:0;
+}
+.rank-1 { background:var(--green); color:white; box-shadow:0 2px 0 var(--green-dark); }
+.rank-2 { background:var(--blue); color:white; box-shadow:0 2px 0 var(--blue-dark); }
+.rank-3 { background:var(--gold); color:white; box-shadow:0 2px 0 var(--gold-dark); }
+.bc-body { padding:16px 18px; }
+.bc-stat { font-size:12px; font-weight:600; color:var(--muted); margin-bottom:4px; }
+.bc-stat b{ color:var(--text); font-weight:800; }
+.bc-tags { display:flex; flex-wrap:wrap; gap:5px; margin:10px 0; }
+.bc-tag  { font-size:11px; font-weight:700; padding:3px 9px; border-radius:var(--radius-pill); background:var(--off-white); border:2px solid var(--border); color:var(--muted); }
+.bc-why  { background:var(--off-white); border-radius:var(--radius-sm); padding:10px 12px; font-size:12px; font-weight:600; color:var(--text); line-height:1.5; margin-top:10px; }
+.bc-contact { padding:14px 18px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; background:var(--off-white); }
+.bc-ph { font-size:14px; font-weight:900; color:var(--blue-dark); }
+.bc-web{ font-size:12px; font-weight:700; color:var(--muted); }
+
+/* Turnkey 2-col */
+.turnkey-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
+.tk-card {
+  background:var(--white); border:2px solid var(--border);
+  border-radius:var(--radius-lg); overflow:hidden;
+  box-shadow:0 3px 0 var(--border);
+}
+.tk-head {
+  padding:18px 20px; border-bottom:2px solid var(--border);
+  background: linear-gradient(135deg, var(--green-bg), var(--white));
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.tk-name  { font-size:22px; font-weight:900; color:var(--text); }
+.tk-award { font-size:11px; font-weight:900; background:var(--green); color:white; padding:4px 10px; border-radius:var(--radius-pill); box-shadow:0 2px 0 var(--green-dark); }
+.tk-body  { padding:20px; }
+.tk-grid  { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.tk-kv    { display:flex; flex-direction:column; gap:3px; }
+.tk-k     { font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:1px; color:var(--muted2); }
+.tk-v     { font-size:14px; font-weight:800; color:var(--text); }
+.tk-how   { background:var(--green-bg); border:2px solid var(--green-pale); border-radius:var(--radius-md); padding:12px; font-size:13px; font-weight:600; color:var(--green-deep); line-height:1.6; margin-bottom:14px; }
+.tk-foot  { padding:14px 20px; border-top:2px solid var(--border); background:var(--off-white); display:flex; justify-content:space-between; align-items:center; }
+.tk-ph    { font-size:16px; font-weight:900; color:var(--blue-dark); }
+.tk-web   { font-size:13px; font-weight:700; color:var(--muted); }
+
+/* ===================== FOOTER BAR ===================== */
+.footer-bar {
+  position:fixed; bottom:0; left:0; right:0; z-index:100;
+  background:var(--white); border-top:2px solid var(--border);
+  padding:14px 32px;
+  display:flex; align-items:center; justify-content:space-between;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+}
+.footer-step { display:flex; flex-direction:column; gap:2px; }
+.footer-name { font-size:16px; font-weight:900; color:var(--text); }
+.footer-desc { font-size:12px; font-weight:600; color:var(--muted2); }
+.footer-btns { display:flex; gap:12px; }
+
+/* ===================== VIEW MANAGEMENT ===================== */
+.view { display:none; }
+.view.active { display:block; }
+
+/* ===================== PLACEHOLDER STEPS ===================== */
+.placeholder-body { text-align:center; padding:60px 40px; }
+.placeholder-icon { font-size:72px; margin-bottom:18px; animation:bounce 2s ease-in-out infinite; display:block; }
+.placeholder-h  { font-size:32px; font-weight:900; margin-bottom:10px; }
+.placeholder-p  { font-size:16px; font-weight:600; color:var(--muted); max-width:480px; margin:0 auto 28px; line-height:1.6; }
+
+/* ===================== SCROLLBAR ===================== */
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:var(--off-white); }
+::-webkit-scrollbar-thumb { background:var(--border-dark); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<!-- =================== HEADER =================== -->
+<header class="header">
+  <div class="logo-block">
+
+    <!-- ANIMATED LOGO: Car → Building → Money -->
+    <div class="logo-anim-wrap">
+      <!-- CAR SVG -->
+      <svg class="car-svg" viewBox="0 0 56 56" fill="none">
+        <rect x="4" y="28" width="48" height="18" rx="4" fill="#58CC02"/>
+        <path d="M14 28 L20 16 L38 16 L44 28 Z" fill="#46A302"/>
+        <rect x="20" y="17" width="8" height="10" rx="2" fill="#DFF4FF" opacity="0.9"/>
+        <rect x="30" y="17" width="8" height="10" rx="2" fill="#DFF4FF" opacity="0.9"/>
+        <circle cx="16" cy="46" r="6" fill="#1C1C1C"/>
+        <circle cx="16" cy="46" r="3" fill="#777"/>
+        <circle cx="40" cy="46" r="6" fill="#1C1C1C"/>
+        <circle cx="40" cy="46" r="3" fill="#777"/>
+        <rect x="44" y="31" width="6" height="5" rx="2" fill="#FFF8E0"/>
+        <rect x="6" y="31" width="5" height="5" rx="2" fill="#FF4B4B" opacity="0.8"/>
+      </svg>
+
+      <!-- BUILDING SVG -->
+      <svg class="build-svg" viewBox="0 0 56 56" fill="none">
+        <rect x="8" y="14" width="40" height="38" rx="4" fill="#58CC02"/>
+        <rect x="8" y="10" width="40" height="7" rx="3" fill="#46A302"/>
+        <rect x="20" y="6" width="16" height="6" rx="3" fill="#2A6B00"/>
+        <rect x="14" y="20" width="8" height="8" rx="2" fill="white" opacity="0.9"/>
+        <rect x="26" y="20" width="8" height="8" rx="2" fill="white" opacity="0.9"/>
+        <rect x="38" y="20" width="6" height="8" rx="2" fill="white" opacity="0.9"/>
+        <rect x="14" y="34" width="8" height="8" rx="2" fill="white" opacity="0.9"/>
+        <rect x="38" y="34" width="6" height="8" rx="2" fill="white" opacity="0.9"/>
+        <rect x="22" y="36" width="12" height="16" rx="3" fill="#2A6B00"/>
+        <rect x="8" y="50" width="40" height="2" rx="1" fill="#2A6B00"/>
+        <!-- sparkles -->
+        <circle cx="6" cy="10" r="2" fill="#FF9600" style="animation:sparkle 3.6s 1.6s infinite"/>
+        <circle cx="50" cy="8"  r="2" fill="#1CB0F6" style="animation:sparkle 3.6s 1.8s infinite"/>
+        <circle cx="52" cy="22" r="2" fill="#FF9600" style="animation:sparkle 3.6s 2s infinite"/>
+      </svg>
+
+      <!-- MONEY SVG -->
+      <svg class="money-svg" viewBox="0 0 56 56" fill="none">
+        <!-- bag body -->
+        <ellipse cx="28" cy="38" rx="18" ry="16" fill="#FF9600"/>
+        <ellipse cx="28" cy="38" rx="18" ry="16" fill="url(#mgr)"/>
+        <defs>
+          <radialGradient id="mgr" cx="40%" cy="35%">
+            <stop offset="0%" stop-color="white" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="black" stop-opacity="0.1"/>
+          </radialGradient>
+        </defs>
+        <!-- bag tie -->
+        <rect x="21" y="22" width="14" height="5" rx="2" fill="#CC7700"/>
+        <!-- knot -->
+        <ellipse cx="28" cy="21" rx="7" ry="5" fill="#FF9600" stroke="#CC7700" stroke-width="2"/>
+        <!-- dollar sign -->
+        <text x="28" y="44" font-family="Nunito,sans-serif" font-size="20" font-weight="900" fill="white" text-anchor="middle">$</text>
+        <!-- sparkle coins -->
+        <circle cx="8"  cy="20" r="5" fill="#FF9600" stroke="#CC7700" stroke-width="2" style="animation:sparkle 0.5s 0s infinite"/>
+        <circle cx="48" cy="18" r="5" fill="#FF9600" stroke="#CC7700" stroke-width="2" style="animation:sparkle 0.5s 0.1s infinite"/>
+        <circle cx="14" cy="8"  r="4" fill="#FF9600" stroke="#CC7700" stroke-width="2" style="animation:sparkle 0.5s 0.2s infinite"/>
+        <circle cx="42" cy="8"  r="3" fill="#FFD966" stroke="#CC7700" stroke-width="1.5" style="animation:sparkle 0.5s 0.15s infinite"/>
+      </svg>
+    </div>
+
+    <div class="logo-text">
+      <div class="logo-name">Self-Storage <span>Business Planner</span></div>
+      <div class="logo-tag">Opportunity Intelligence Platform</div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div class="xp-badge">🔥 Session Active</div>
+    <div class="streak-badge">✅ Prototype v1.0</div>
+  </div>
+</header>
+
+<!-- =================== STEPPER =================== -->
+<div class="stepper-wrap">
+  <div class="stepper">
+    <div class="step active" id="step-tab-1" onclick="goToStep(1)">
+      <div class="step-bubble" id="step-bub-1">1</div>
+      <div class="step-info"><div class="step-name">Interview</div><div class="step-desc">Profile</div></div>
+    </div>
+    <div class="step locked" id="step-tab-2" onclick="goToStep(2)">
+      <div class="step-bubble" id="step-bub-2">2</div>
+      <div class="step-info"><div class="step-name">Review</div><div class="step-desc">Confirm</div></div>
+    </div>
+    <div class="step locked" id="step-tab-3" onclick="goToStep(3)">
+      <div class="step-bubble" id="step-bub-3">3</div>
+      <div class="step-info"><div class="step-name">Advisory</div><div class="step-desc">Market Intel</div></div>
+    </div>
+    <div class="step locked" id="step-tab-4" onclick="goToStep(4)">
+      <div class="step-bubble" id="step-bub-4">4</div>
+      <div class="step-info"><div class="step-name">Selection</div><div class="step-desc">Site</div></div>
+    </div>
+    <div class="step locked" id="step-tab-5" onclick="goToStep(5)">
+      <div class="step-bubble" id="step-bub-5">5</div>
+      <div class="step-info"><div class="step-name">Business Plan</div><div class="step-desc">Projections</div></div>
+    </div>
+    <div class="step locked" id="step-tab-6" onclick="goToStep(6)">
+      <div class="step-bubble" id="step-bub-6">6</div>
+      <div class="step-info"><div class="step-name">Resources</div><div class="step-desc">Partners</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== STEP 1: INTERVIEW =================== -->
+<div class="view active" id="view-1">
+<div class="main">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">👤 Personal Profile <span class="chip">Step 1 of 6</span></div>
+      <div style="font-size:13px;font-weight:700;color:var(--muted2);">All fields optional — more data = better recommendations</div>
+    </div>
+    <div class="card-body">
+      <div class="section-head"><span class="section-head-line">Your Identity</span></div>
+      <div class="form-grid grid-3">
+        <div class="form-group">
+          <label class="form-label">First Name <span class="opt">optional</span></label>
+          <input class="form-input" type="text" id="f_fname" placeholder="John">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name <span class="opt">optional</span></label>
+          <input class="form-input" type="text" id="f_lname" placeholder="Smith">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email <span class="opt">optional</span></label>
+          <input class="form-input" type="email" id="f_email" placeholder="john@email.com">
+        </div>
+        <div class="form-group col-2">
+          <label class="form-label">Street Address <span class="opt">optional</span></label>
+          <input class="form-input" type="text" id="f_address" placeholder="123 Main Street, City, State ZIP">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone <span class="opt">optional</span></label>
+          <input class="form-input" type="tel" id="f_phone" placeholder="(555) 000-0000">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">💰 Financial Profile</div></div>
+    <div class="card-body">
+      <div class="banner banner-info">
+        <span class="banner-icon">ℹ️</span>
+        <div>This helps match you with the right facility scale and financing options. Everything stays private within this session. More detail = more precise recommendations — but nothing is required.</div>
+      </div>
+      <div class="section-head"><span class="section-head-line">Available Capital</span></div>
+      <div class="form-grid grid-2">
+        <div class="form-group">
+          <label class="form-label">Cash on Hand</label>
+          <div class="input-pfx"><span class="pfx-sym">$</span><input class="form-input" type="text" id="f_cash" placeholder="0" oninput="updateFin()"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Liquid Assets <span class="opt">stocks, savings</span></label>
+          <div class="input-pfx"><span class="pfx-sym">$</span><input class="form-input" type="text" id="f_liquid" placeholder="0" oninput="updateFin()"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Secondary Sources <span class="opt">IRA, 401k, equity</span></label>
+          <div class="input-pfx"><span class="pfx-sym">$</span><input class="form-input" type="text" id="f_secondary" placeholder="0" oninput="updateFin()"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Comfortable Borrowing Amount</label>
+          <div class="input-pfx"><span class="pfx-sym">$</span><input class="form-input" type="text" id="f_borrow" placeholder="0" oninput="updateFin()"></div>
+        </div>
+      </div>
+      <div class="fin-row">
+        <div class="fin-cell"><div class="fin-lbl">Cash + Liquid</div><div class="fin-val" id="fin_cl">$0</div><div class="fin-sub">Immediately available</div></div>
+        <div class="fin-cell"><div class="fin-lbl">With Secondary</div><div class="fin-val" id="fin_sec">$0</div><div class="fin-sub">Including secondary</div></div>
+        <div class="fin-cell"><div class="fin-lbl">Total w/ Financing</div><div class="fin-val" id="fin_tot">$0</div><div class="fin-sub">Maximum capacity</div></div>
+        <div class="fin-cell"><div class="fin-lbl">Borrowing</div><div class="fin-val" id="fin_bor">$0</div><div class="fin-sub">Comfortable debt</div></div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px;"><span class="section-head-line">Financing Preferences</span></div>
+      <div class="form-grid grid-3">
+        <div class="form-group">
+          <label class="form-label">Target Interest Rate</label>
+          <div class="range-group">
+            <div class="range-vals">
+              <span class="range-ends">4%</span>
+              <span class="range-cur" id="rate_cur">7.5%</span>
+              <span class="range-ends">15%</span>
+            </div>
+            <input type="range" min="4" max="15" step="0.5" value="7.5" id="f_rate" oninput="document.getElementById('rate_cur').textContent=this.value+'%'">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Estimated Credit Score</label>
+          <input class="form-input" type="number" id="f_credit" min="300" max="850" placeholder="720" oninput="updateCredit()">
+        </div>
+        <div class="form-group">
+          <div class="score-card">
+            <div class="score-num" id="scoreNum">—</div>
+            <div class="score-lbl" id="scoreLbl">Enter your credit score</div>
+            <div class="score-track"><div class="score-fill" id="scoreBar" style="--pct:0%"></div></div>
+            <div class="score-ticks"><span>300</span><span>Poor</span><span>Fair</span><span>Good</span><span>Excl.</span><span>850</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">🏗️ Facility Vision</div></div>
+    <div class="card-body">
+
+      <div class="section-head"><span class="section-head-line">Facility Scale</span></div>
+      <div class="scale-grid">
+        <div class="scale-card" onclick="selCard(this,'scale')">
+          <div class="sc-icon">🏪</div><div class="sc-name">Small</div>
+          <div class="sc-range">25–75 units</div>
+          <div class="sc-desc">Starter facility, lower land cost, simple ops</div>
+        </div>
+        <div class="scale-card sel" onclick="selCard(this,'scale')">
+          <div class="sc-icon">🏬</div><div class="sc-name">Medium</div>
+          <div class="sc-range">75–200 units</div>
+          <div class="sc-desc">Best ROI balance, can support a full-time manager</div>
+        </div>
+        <div class="scale-card" onclick="selCard(this,'scale')">
+          <div class="sc-icon">🏢</div><div class="sc-name">Large</div>
+          <div class="sc-range">200–500 units</div>
+          <div class="sc-desc">Institutional-grade, higher cap rates, climate control</div>
+        </div>
+        <div class="scale-card" onclick="selCard(this,'scale')">
+          <div class="sc-icon">🏙️</div><div class="sc-name">Mega</div>
+          <div class="sc-range">500+ units</div>
+          <div class="sc-desc">REIT-attractive, multi-story, premium submarkets</div>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:26px;"><span class="section-head-line">Phased Development</span></div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+        <div class="toggle on" id="phaseToggle" onclick="togglePhase()"></div>
+        <span class="toggle-label">Enable phased development <span style="font-size:13px;font-weight:600;color:var(--muted2);">— build in stages to spread capital requirements</span></span>
+      </div>
+      <div class="phase-list" id="phaseList">
+        <div class="phase-row active">
+          <div class="phase-dot">1</div>
+          <div class="phase-info"><div class="phase-title">Phase 1 — Foundation Build</div><div class="phase-desc">Land, site prep, core units. Target: 40–60% of total unit count.</div></div>
+          <select class="form-select" style="width:140px"><option>Year 1–2</option><option>Year 1</option><option>Year 1–3</option></select>
+        </div>
+        <div class="phase-row">
+          <div class="phase-dot">2</div>
+          <div class="phase-info"><div class="phase-title">Phase 2 — Expansion</div><div class="phase-desc">Additional rows, climate wing, covered parking expansion.</div></div>
+          <select class="form-select" style="width:140px"><option>Year 2–3</option><option>Year 2</option><option>Year 3–4</option></select>
+        </div>
+        <div class="phase-row">
+          <div class="phase-dot">3</div>
+          <div class="phase-info"><div class="phase-title">Phase 3 — Premium Amenities</div><div class="phase-desc">Covered canopies, kiosk automation, solar, security upgrades.</div></div>
+          <select class="form-select" style="width:140px"><option>Year 3–5</option><option>Year 3</option><option>Year 4–5</option></select>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:26px;"><span class="section-head-line">Unit Types to Offer</span></div>
+      <div class="banner banner-green" style="margin-bottom:14px;">
+        <span class="banner-icon">💡</span>
+        <div>Select all unit types you plan to include. These drive the competitive gap analysis and financial projections.</div>
+      </div>
+
+      <div style="font-size:13px;font-weight:800;color:var(--blue-dark);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">🚗 Vehicle & Outdoor Storage</div>
+      <div class="cb-grid" style="margin-bottom:18px;">
+        <div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"></div><div><div class="cb-txt">🚤 Boat/Trailer — Covered</div><div class="cb-sub">Enclosed or canopied bay</div></div></div>
+        <div class="cb-item on" onclick="toggleCb(this)"><div class="cb-box">✓</div><div><div class="cb-txt">⛵ Boat/Trailer — Uncovered</div><div class="cb-sub">Open lot, lower cost</div></div></div>
+        <div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"></div><div><div class="cb-txt">🚘 Vehicle — Covered</div><div class="cb-sub">Premium car storage</div></div></div>
+        <div class="cb-item on" onclick="toggleCb(this)"><div class="cb-box">✓</div><div><div class="cb-txt">🅿️ Vehicle — Uncovered</div><div class="cb-sub">Standard parking</div></div></div>
+      </div>
+
+      <div style="font-size:13px;font-weight:800;color:var(--gold-dark);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">📦 Non-Climate Controlled</div>
+      <div class="cb-grid" style="margin-bottom:18px;">
+        <div class="cb-item on" onclick="toggleCb(this)"><div class="cb-box">✓</div><div><div class="cb-txt">5×5 Non-Climate</div><div class="cb-sub">25 sq ft · closet-size</div></div></div>
+        <div class="cb-item on" onclick="toggleCb(this)"><div class="cb-box">✓</div><div><div class="cb-txt">10×15 Non-Climate</div><div class="cb-sub">150 sq ft · 1-bedroom</div></div></div>
+        <div class="cb-item on" onclick="toggleCb(this)"><div class="cb-box">✓</div><div><div class="cb-txt">10×20 Non-Climate</div><div class="cb-sub">200 sq ft · 2-bedroom</div></div></div>
+        <div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"></div><div><div class="cb-txt">10×30 Non-Climate</div><div class="cb-sub">300 sq ft · large haul</div></div></div>
+      </div>
+
+      <div style="font-size:13px;font-weight:800;color:var(--green-dark);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">❄️ Climate Controlled</div>
+      <div class="cb-grid">
+        <div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"></div><div><div class="cb-txt">5×5 Climate</div><div class="cb-sub">25 sq ft · wine/docs</div></div></div>
+        <div class="cb-item on" onclick="toggleCb(this)"><div class="cb-box">✓</div><div><div class="cb-txt">10×15 Climate</div><div class="cb-sub">150 sq ft · premium</div></div></div>
+        <div class="cb-item on" onclick="toggleCb(this)"><div class="cb-box">✓</div><div><div class="cb-txt">10×20 Climate</div><div class="cb-sub">200 sq ft · premium</div></div></div>
+        <div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"></div><div><div class="cb-txt">10×30 Climate</div><div class="cb-sub">300 sq ft · max premium</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">📍 Target Search Area</div></div>
+    <div class="card-body">
+      <div class="section-head"><span class="section-head-line">Define Your Market</span></div>
+      <div class="zip-grid">
+        <div>
+          <div class="form-group" style="margin-bottom:18px;">
+            <label class="form-label">ZIP Code</label>
+            <input class="form-input" type="text" id="f_zip" maxlength="5" placeholder="66048" style="font-size:28px;font-weight:900;padding:18px;letter-spacing:5px;" oninput="updateRadius()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Search Radius</label>
+            <div class="range-group">
+              <div class="range-vals">
+                <span class="range-ends">1 mi</span>
+                <span class="range-cur" id="miles_cur">10 mi</span>
+                <span class="range-ends">20 mi</span>
+              </div>
+              <input type="range" min="1" max="20" step="1" value="10" id="f_miles" oninput="updateRadius()">
+            </div>
+          </div>
+          <div style="display:flex;gap:20px;margin-top:12px;font-size:13px;font-weight:700;color:var(--muted);">
+            <span>ZIP: <span style="color:var(--green-dark);font-weight:900;" id="zip_pr">66048</span></span>
+            <span>Radius: <span style="color:var(--green-dark);font-weight:900;" id="rad_pr">10 miles</span></span>
+            <span>Area: <span style="color:var(--green-dark);font-weight:900;" id="area_pr">~314 sq mi</span></span>
+          </div>
+        </div>
+        <div>
+          <div class="radius-box" id="radViz">
+            <div class="r-ring" id="ring1" style="width:140px;height:140px;"></div>
+            <div class="r-ring" id="ring2" style="width:100px;height:100px;"></div>
+            <div class="r-ring" id="ring3" style="width:60px;height:60px;"></div>
+            <div class="r-dot"></div>
+            <div class="r-label" id="radLbl">📍 10 Mile Radius</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="footer-bar">
+  <div class="footer-step"><div class="footer-name">Step 1: Interview</div><div class="footer-desc">Complete your profile to proceed</div></div>
+  <div class="footer-btns">
+    <button class="btn btn-ghost">Clear Form</button>
+    <button class="btn btn-primary" onclick="goToStep(2)">Continue →</button>
+  </div>
+</div>
+</div>
+
+<!-- =================== STEP 2: REVIEW =================== -->
+<div class="view" id="view-2">
+<div class="main">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🔍 Review Your Selections <span class="chip">Step 2 of 6</span></div>
+    </div>
+    <div class="card-body">
+      <div class="banner banner-info">
+        <span class="banner-icon">ℹ️</span>
+        <div>Review everything below before proceeding. Once confirmed, the app scans your target market for competitive intelligence. You can edit any section before running.</div>
+      </div>
+
+      <div class="review-block">
+        <div class="review-hd"><span class="review-title">👤 Personal Profile</span><button class="btn btn-ghost" style="padding:6px 14px;font-size:12px;" onclick="goToStep(1)">✏️ Edit</button></div>
+        <div class="review-bd">
+          <div class="review-grid">
+            <div class="rv-item"><div class="rv-key">Name</div><div class="rv-val" id="rv_name">Not provided</div></div>
+            <div class="rv-item"><div class="rv-key">Email</div><div class="rv-val na" id="rv_email">Not provided</div></div>
+            <div class="rv-item"><div class="rv-key">Phone</div><div class="rv-val na" id="rv_phone">Not provided</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-block">
+        <div class="review-hd"><span class="review-title">💰 Financial Profile</span><button class="btn btn-ghost" style="padding:6px 14px;font-size:12px;" onclick="goToStep(1)">✏️ Edit</button></div>
+        <div class="review-bd">
+          <div class="review-grid">
+            <div class="rv-item"><div class="rv-key">Cash on Hand</div><div class="rv-val money" id="rv_cash">$0</div></div>
+            <div class="rv-item"><div class="rv-key">Liquid Assets</div><div class="rv-val money" id="rv_liquid">$0</div></div>
+            <div class="rv-item"><div class="rv-key">Secondary Sources</div><div class="rv-val money" id="rv_secondary">$0</div></div>
+            <div class="rv-item"><div class="rv-key">Borrowing Comfort</div><div class="rv-val money" id="rv_borrow">$0</div></div>
+            <div class="rv-item"><div class="rv-key">Target Rate</div><div class="rv-val" id="rv_rate">7.5%</div></div>
+            <div class="rv-item"><div class="rv-key">Credit Score</div><div class="rv-val na" id="rv_credit">Not provided</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-block">
+        <div class="review-hd"><span class="review-title">🏗️ Facility Vision</span><button class="btn btn-ghost" style="padding:6px 14px;font-size:12px;" onclick="goToStep(1)">✏️ Edit</button></div>
+        <div class="review-bd">
+          <div class="review-grid">
+            <div class="rv-item"><div class="rv-key">Scale</div><div class="rv-val" id="rv_scale">Medium (75–200 units)</div></div>
+            <div class="rv-item"><div class="rv-key">Phased Dev.</div><div class="rv-val" id="rv_phase">Yes — 3 Phases</div></div>
+            <div class="rv-item"><div class="rv-key">Unit Types</div><div class="rv-val" id="rv_units">7 selected</div></div>
+          </div>
+          <div style="margin-top:12px;"><div class="rv-key" style="margin-bottom:6px;">Selected Unit Types</div>
+            <div class="tag-row">
+              <span class="tag blue">⛵ Boat/Trailer Uncovered</span>
+              <span class="tag blue">🅿️ Vehicle Uncovered</span>
+              <span class="tag">📦 5×5 NC</span><span class="tag">📦 10×15 NC</span>
+              <span class="tag">📦 10×20 NC</span>
+              <span class="tag purple">❄️ 10×15 CC</span>
+              <span class="tag purple">❄️ 10×20 CC</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-block">
+        <div class="review-hd"><span class="review-title">📍 Target Area</span><button class="btn btn-ghost" style="padding:6px 14px;font-size:12px;" onclick="goToStep(1)">✏️ Edit</button></div>
+        <div class="review-bd">
+          <div class="review-grid">
+            <div class="rv-item"><div class="rv-key">ZIP Code</div><div class="rv-val big" id="rv_zip">66048</div></div>
+            <div class="rv-item"><div class="rv-key">Search Radius</div><div class="rv-val big" id="rv_miles">10 miles</div></div>
+            <div class="rv-item"><div class="rv-key">Coverage</div><div class="rv-val big" id="rv_area">~314 sq mi</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-danger" onclick="goToStep(1)">↩ Start Over</button>
+        <button class="btn btn-secondary" onclick="goToStep(1)">✏️ Edit</button>
+        <button class="btn btn-primary" onclick="goToStep(3)">✅ Confirm & Run Advisory →</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="footer-bar">
+  <div class="footer-step"><div class="footer-name">Step 2: Review</div><div class="footer-desc">Verify before market scan runs</div></div>
+  <div class="footer-btns">
+    <button class="btn btn-ghost" onclick="goToStep(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goToStep(3)">Confirm & Launch →</button>
+  </div>
+</div>
+</div>
+
+<!-- =================== STEP 3: ADVISORY =================== -->
+<div class="view" id="view-3">
+<div class="main">
+
+  <!-- SCAN PANEL -->
+  <div class="scan-progress" id="scanPanel">
+    <div class="scan-title">📡 Scanning Market <span id="scanStatus" style="font-size:14px;font-weight:700;color:var(--green-dark);">— initializing…</span></div>
+    <div class="progress-track"><div class="progress-fill" id="scanBar" style="width:0%"></div></div>
+    <div class="scan-status" id="scanMsg">Preparing market scan for ZIP 66048…</div>
+    <div class="scan-list" id="scanList">
+      <div class="scan-row"><div class="scan-dot running"></div>Locating self-storage businesses within 10 miles of 66048…</div>
+      <div class="scan-row"><div class="scan-dot waiting"></div>Retrieving pricing data from business websites…</div>
+      <div class="scan-row"><div class="scan-dot waiting"></div>Querying Leavenworth County property tax assessments…</div>
+      <div class="scan-row"><div class="scan-dot waiting"></div>Looking up Kansas Secretary of State business records…</div>
+      <div class="scan-row"><div class="scan-dot waiting"></div>Checking publicly traded parent companies (REIT data)…</div>
+      <div class="scan-row"><div class="scan-dot waiting"></div>Retrieving cap rates & NOI data from sale records…</div>
+      <div class="scan-row"><div class="scan-dot waiting"></div>Compiling brokers, lending rates & USDA FSA office…</div>
+    </div>
+  </div>
+
+  <div id="results" style="display:none;">
+
+    <div class="banner banner-warning">
+      <span class="banner-icon">⚠️</span>
+      <div><strong>Data Accuracy Notice:</strong> Pricing sourced from public websites & Google Business profiles. Property assessments from county records. Ownership from KS SOS filings. Blank cells indicate unavailable public data. Verify before financial commitments.</div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-lbl">Competitors Found</div><div class="stat-val">10</div><div class="stat-sub">Within 10-mile radius</div><div class="stat-icon">🏢</div></div>
+      <div class="stat-card"><div class="stat-lbl">Avg 10×10 Rate</div><div class="stat-val">$89</div><div class="stat-sub">Non-climate, monthly</div><div class="stat-icon">💰</div></div>
+      <div class="stat-card"><div class="stat-lbl">Avg. Cap Rate</div><div class="stat-val">6.2%</div><div class="stat-sub">Self-storage, KS market</div><div class="stat-icon">📈</div></div>
+      <div class="stat-card"><div class="stat-lbl">Avg. Lending Rate</div><div class="stat-val">7.4%</div><div class="stat-sub">Commercial SBA 504</div><div class="stat-icon">🏦</div></div>
+    </div>
+
+    <!-- COMPETITOR TABLE -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📊 Competitor Analysis</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary" style="padding:8px 16px;font-size:12px;">⬇ Export CSV</button>
+          <button class="btn btn-secondary" style="padding:8px 16px;font-size:12px;">🖨 Print</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th rowspan="2" style="min-width:165px;">Business</th>
+              <th rowspan="2" style="min-width:130px;">Owner / SOS</th>
+              <th colspan="2" class="grp">Boat & Trailer</th>
+              <th colspan="2" class="grp">Vehicle</th>
+              <th colspan="4" class="grp">Non-Climate / mo</th>
+              <th colspan="4" class="grp">Climate Controlled / mo</th>
+              <th rowspan="2" style="min-width:110px;">Est. Biz Value</th>
+              <th rowspan="2" style="min-width:110px;">Tax Assessment</th>
+            </tr>
+            <tr>
+              <th>Covered</th><th>Uncovered</th><th>Covered</th><th>Uncovered</th>
+              <th>5×5</th><th>10×15</th><th>10×20</th><th>10×30</th>
+              <th>5×5</th><th>10×15</th><th>10×20</th><th>10×30</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="biz-name">iStorage</div><div class="biz-owner">NSA Storage REIT</div><div class="biz-addr">1920 Spruce St, Leavenworth</div><div class="biz-rating">⭐ 4.7 (394)</div><span class="badge-pill badge-pub">PUBLIC · NSA</span></td>
+              <td><div style="font-size:12px;font-weight:800;">NSA Storage Trust</div><div style="font-size:10px;color:var(--muted2);">NYSE: NSA</div><div class="broker-ph" style="font-size:12px;">(913) 404-6647</div></td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="price-cell">$18</td><td class="price-cell">$89</td><td class="price-cell">$119</td><td class="price-cell na">—</td>
+              <td class="price-cell na">—</td><td class="price-cell">$129</td><td class="price-cell">$159</td><td class="price-cell na">—</td>
+              <td class="val-cell">$2.1M–$3.4M<br><span style="font-size:9px;color:var(--muted2);">NOI: ~$180K est.</span></td>
+              <td class="val-cell">$847,200<br><span style="font-size:9px;color:var(--muted2);">2024 Assessment</span></td>
+            </tr>
+            <tr>
+              <td><div class="biz-name">Storage Box Inc.</div><div class="biz-owner">Cherokee St</div><div class="biz-addr">778 Cherokee St, Leavenworth</div><div class="biz-rating">⭐ 4.8 (8)</div><span class="badge-pill badge-priv">PRIVATE</span></td>
+              <td><div style="font-size:12px;font-weight:800;">April Marcum</div><div style="font-size:10px;color:var(--muted2);">KS SOS Registered Agent</div><div class="broker-ph" style="font-size:12px;">(913) 727-1236</div></td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="price-cell">$45</td><td class="price-cell na">—</td><td class="price-cell">$78</td><td class="price-cell na">—</td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="val-cell lo">$450K–$750K</td><td class="val-cell">$198,400</td>
+            </tr>
+            <tr>
+              <td><div class="biz-name">Tower Storage</div><div class="biz-owner">Poplar St</div><div class="biz-addr">215 Poplar St, Leavenworth</div><div class="biz-rating">⭐ 4.7 (40)</div><span class="badge-pill badge-priv">PRIVATE</span></td>
+              <td><div style="font-size:12px;font-weight:800;">Tower Storage LLC</div><div style="font-size:10px;color:var(--muted2);">KS SOS — Active</div><div class="broker-ph" style="font-size:12px;">(913) 651-3700</div></td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell">$75</td><td class="price-cell">$55</td>
+              <td class="price-cell">$40</td><td class="price-cell">$75</td><td class="price-cell">$95</td><td class="price-cell">$130</td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="val-cell">$900K–$1.5M</td><td class="val-cell">$312,600</td>
+            </tr>
+            <tr>
+              <td><div class="biz-name">Storage Box Inc.</div><div class="biz-owner">Eisenhower Rd</div><div class="biz-addr">1314 Eisenhower Rd, Leavenworth</div><div class="biz-rating">⭐ 4.2 (68)</div><span class="badge-pill badge-priv">PRIVATE</span></td>
+              <td><div style="font-size:12px;font-weight:800;">April Marcum</div><div style="font-size:10px;color:var(--muted2);">KS SOS Registered Agent</div><div class="broker-ph" style="font-size:12px;">(913) 727-1236</div></td>
+              <td class="price-cell na">—</td><td class="price-cell">Call</td><td class="price-cell na">—</td><td class="price-cell">Call</td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell">$78</td><td class="price-cell na">—</td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="val-cell">$550K–$900K</td><td class="val-cell">$241,800</td>
+            </tr>
+            <tr>
+              <td><div class="biz-name">Tower Storage</div><div class="biz-owner">Cherokee St</div><div class="biz-addr">748 Cherokee St, Leavenworth</div><div class="biz-rating">⭐ 4.5 (6)</div><span class="badge-pill badge-priv">PRIVATE</span></td>
+              <td><div style="font-size:12px;font-weight:800;">Tower Storage LLC</div><div style="font-size:10px;color:var(--muted2);">KS SOS — Active</div><div class="broker-ph" style="font-size:12px;">(913) 651-3700</div></td>
+              <td class="price-cell na">—</td><td class="price-cell">$60</td><td class="price-cell na">—</td><td class="price-cell">$50</td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="val-cell lo">$300K–$550K</td><td class="val-cell">$128,400</td>
+            </tr>
+            <tr>
+              <td><div class="biz-name">Logan St. Mini Storage</div><div class="biz-owner">Leavenworth</div><div class="biz-addr">319 Logan St, Leavenworth</div><div class="biz-rating">⭐ 5.0 (1)</div><span class="badge-pill badge-priv">PRIVATE</span></td>
+              <td><div style="font-size:12px;font-weight:800;">— Pending SOS —</div><div class="broker-ph" style="font-size:12px;">(913) 380-2699</div></td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="val-cell lo">$150K–$350K</td><td class="val-cell">$89,200</td>
+            </tr>
+            <tr>
+              <td><div class="biz-name">U-Haul Self Storage</div><div class="biz-owner">4820 S 4th St</div><div class="biz-addr">4820 S 4th St, Leavenworth</div><div class="biz-rating">⭐ 5.0 (4)</div><span class="badge-pill badge-pub">PUBLIC · UHAL</span></td>
+              <td><div style="font-size:12px;font-weight:800;">U-Haul International</div><div style="font-size:10px;color:var(--muted2);">AMERCO / NASDAQ: UHAL</div><div class="broker-ph" style="font-size:12px;">(913) 828-0743</div></td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="price-cell">$34</td><td class="price-cell">$79</td><td class="price-cell">$99</td><td class="price-cell">$129</td>
+              <td class="price-cell">$44</td><td class="price-cell">$99</td><td class="price-cell">$119</td><td class="price-cell">$149</td>
+              <td class="val-cell">Corporate owned</td><td class="val-cell">$1,240,000</td>
+            </tr>
+            <tr>
+              <td><div class="biz-name">Complete Storage</div><div class="biz-owner">Lansing, KS</div><div class="biz-addr">120 Holiday Terrace, Lansing</div><div class="biz-rating">⭐ 4.5 (12)</div><span class="badge-pill badge-priv">PRIVATE</span></td>
+              <td><div style="font-size:12px;font-weight:800;">Complete Storage LLC</div><div class="broker-ph" style="font-size:12px;">(913) 727-1021</div></td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="price-cell">$38</td><td class="price-cell">$65</td><td class="price-cell">$80</td><td class="price-cell na">—</td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="val-cell lo">$500K–$850K</td><td class="val-cell">$224,600</td>
+            </tr>
+            <tr>
+              <td><div class="biz-name">AAA Mini Warehouse</div><div class="biz-owner">Lansing, KS</div><div class="biz-addr">602 N Main St, Lansing</div><div class="biz-rating">⭐ 3.7 (29)</div><span class="badge-pill badge-priv">PRIVATE</span></td>
+              <td><div style="font-size:12px;font-weight:800;">D.J. Price (Owner)</div><div class="broker-ph" style="font-size:12px;">(913) 727-6470</div></td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell">$42</td>
+              <td class="price-cell">$42</td><td class="price-cell">$72</td><td class="price-cell">$90</td><td class="price-cell na">—</td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="val-cell lo">$350K–$650K</td><td class="val-cell">$176,400</td>
+            </tr>
+            <tr>
+              <td><div class="biz-name">Crestline Storage</div><div class="biz-owner">Lansing, KS</div><div class="biz-addr">13621 E Gilman Rd, Lansing</div><div class="biz-rating">⭐ 4.7 (31)</div><span class="badge-pill badge-priv">PRIVATE</span></td>
+              <td><div style="font-size:12px;font-weight:800;">Nicole Schreiber</div><div class="broker-ph" style="font-size:12px;">(913) 727-6300</div></td>
+              <td class="price-cell na">—</td><td class="price-cell">$50</td><td class="price-cell na">—</td><td class="price-cell">$45</td>
+              <td class="price-cell">$38</td><td class="price-cell">$78</td><td class="price-cell">$98</td><td class="price-cell">$152</td>
+              <td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td><td class="price-cell na">—</td>
+              <td class="val-cell">$850K–$1.4M</td><td class="val-cell">$389,200</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- OPPORTUNITY GAP -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">🎯 Opportunity Gap Analysis</div></div>
+      <div class="card-body">
+        <div style="font-size:14px;font-weight:600;color:var(--muted);margin-bottom:4px;">Unit types with the strongest unmet demand based on your selections vs. market supply:</div>
+        <div class="gap-grid">
+          <div class="gap-card hot">
+            <div class="gap-title">❄️ Climate Controlled <span class="hot-chip">HOT</span></div>
+            <div class="gap-stat">Providers in market: <b>2 of 10</b></div>
+            <div class="gap-stat">Avg rate: <b>$99–$159/mo</b></div>
+            <div class="gap-stat">Gap score: <b>HIGH</b></div>
+            <div class="opp-track"><div class="opp-fill hi" style="width:88%"></div></div>
+          </div>
+          <div class="gap-card hot">
+            <div class="gap-title">🚤 Covered Boat/Trailer <span class="hot-chip">HOT</span></div>
+            <div class="gap-stat">Providers in market: <b>0 of 10</b></div>
+            <div class="gap-stat">Avg rate: <b>$120–$200/mo</b></div>
+            <div class="gap-stat">Gap score: <b>VERY HIGH</b></div>
+            <div class="opp-track"><div class="opp-fill hi" style="width:97%"></div></div>
+          </div>
+          <div class="gap-card">
+            <div class="gap-title">🚘 Covered Vehicle Storage</div>
+            <div class="gap-stat">Providers in market: <b>1 of 10</b></div>
+            <div class="gap-stat">Avg rate: <b>$75–$120/mo</b></div>
+            <div class="gap-stat">Gap score: <b>MEDIUM</b></div>
+            <div class="opp-track"><div class="opp-fill med" style="width:58%"></div></div>
+          </div>
+          <div class="gap-card">
+            <div class="gap-title">📦 10×30 Non-Climate</div>
+            <div class="gap-stat">Providers in market: <b>3 of 10</b></div>
+            <div class="gap-stat">Avg rate: <b>$129–$152/mo</b></div>
+            <div class="gap-stat">Gap score: <b>MEDIUM</b></div>
+            <div class="opp-track"><div class="opp-fill med" style="width:52%"></div></div>
+          </div>
+          <div class="gap-card">
+            <div class="gap-title">📦 5×5 Small Units</div>
+            <div class="gap-stat">Providers in market: <b>5 of 10</b></div>
+            <div class="gap-stat">Avg rate: <b>$18–$45/mo</b></div>
+            <div class="gap-stat">Gap score: <b>LOW</b></div>
+            <div class="opp-track"><div class="opp-fill lo" style="width:28%"></div></div>
+          </div>
+          <div class="gap-card">
+            <div class="gap-title">📦 10×15–10×20 Standard</div>
+            <div class="gap-stat">Providers in market: <b>8 of 10</b></div>
+            <div class="gap-stat">Avg rate: <b>$65–$119/mo</b></div>
+            <div class="gap-stat">Gap score: <b>LOW</b></div>
+            <div class="opp-track"><div class="opp-fill lo" style="width:18%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BROKERS & USDA -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">🏦 Lenders, Brokers & USDA FSA</div></div>
+      <div class="card-body" style="padding:0;">
+        <table class="broker-tbl">
+          <thead>
+            <tr><th>Institution</th><th>Type</th><th>Rate</th><th>Loan Types</th><th>Specialty</th><th>Address</th><th>Phone</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="broker-name">Landmark National Bank</div><div style="font-size:11px;color:var(--muted2);">Leavenworth, KS</div></td>
+              <td><span class="badge-pill badge-priv">Regional Bank</span></td>
+              <td><span class="broker-rate">7.25%</span></td>
+              <td>SBA 7(a), Conventional</td><td>Small business CRE, self-storage</td>
+              <td><div class="broker-addr">200 S. Broadway<br>Leavenworth, KS 66048</div></td>
+              <td><div class="broker-ph">(913) 651-0600</div></td>
+            </tr>
+            <tr>
+              <td><div class="broker-name">Security State Bank</div><div style="font-size:11px;color:var(--muted2);">Lansing, KS</div></td>
+              <td><span class="badge-pill badge-priv">Community Bank</span></td>
+              <td><span class="broker-rate">7.10%</span></td>
+              <td>SBA 504, Commercial RE</td><td>Agricultural & commercial land</td>
+              <td><div class="broker-addr">108 S. Main St<br>Lansing, KS 66043</div></td>
+              <td><div class="broker-ph">(913) 727-2266</div></td>
+            </tr>
+            <tr>
+              <td><div class="broker-name">CBRE Kansas City</div><div style="font-size:11px;color:var(--muted2);">KC Metro Region</div></td>
+              <td><span class="badge-pill badge-pub">CRE Broker</span></td>
+              <td><span class="broker-rate">6.90%</span></td>
+              <td>Bridge, CMBS, Life Co.</td><td>Industrial & self-storage acquisitions</td>
+              <td><div class="broker-addr">4520 Main St, Ste 1000<br>Kansas City, MO 64111</div></td>
+              <td><div class="broker-ph">(816) 960-5000</div></td>
+            </tr>
+            <tr>
+              <td><div class="broker-name">Midland States Bank</div><div style="font-size:11px;color:var(--muted2);">Self-Storage Division</div></td>
+              <td><span class="badge-pill badge-priv">Specialty Lender</span></td>
+              <td><span class="broker-rate">7.55%</span></td>
+              <td>Storage construction & perm</td><td>National self-storage specialist</td>
+              <td><div class="broker-addr">National — call for nearest</div></td>
+              <td><div class="broker-ph">(800) 771-3919</div></td>
+            </tr>
+            <tr>
+              <td><div class="broker-name">SBA District Office — KS</div><div style="font-size:11px;color:var(--muted2);">Federal Program</div></td>
+              <td><span class="badge-pill" style="color:var(--blue-dark);background:var(--blue-pale);border-color:#AADBF5;">SBA</span></td>
+              <td><span class="broker-rate">6.75%</span></td>
+              <td>SBA 504 (10–25yr fixed)</td><td>New construction, owner-occupied CRE</td>
+              <td><div class="broker-addr">271 W 3rd St N, Ste 2500<br>Wichita, KS 67202</div></td>
+              <td><div class="broker-ph">(316) 269-6616</div></td>
+            </tr>
+            <tr class="usda-row">
+              <td>
+                <div class="broker-name" style="color:var(--green-dark);">USDA Farm Service Agency</div>
+                <div style="font-size:11px;color:var(--muted2);">Leavenworth County Service Center</div>
+                <span class="badge-pill badge-govt" style="margin-top:4px;display:inline-flex;">🌾 USDA FSA</span>
+              </td>
+              <td><span class="badge-pill badge-govt">Federal — USDA</span></td>
+              <td><span class="broker-rate" style="color:var(--green-dark);">Varies</span><div style="font-size:10px;color:var(--muted2);margin-top:2px;">Rural dev. programs</div></td>
+              <td>Farm Loans, Rural Dev., B&amp;I Loans</td>
+              <td>Rural commercial RE, land acquisition, rural development grants</td>
+              <td><div class="broker-addr"><strong style="color:var(--text);">425 Laming Rd</strong><br>Tonganoxie, KS 66086</div></td>
+              <td><div class="broker-ph">(913) 845-2020</div><div style="font-size:11px;color:var(--muted2);margin-top:3px;">National: (877) 508-8364</div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BUILDERS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🏗️ Recommended Facility Builders</div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted2);">Top Regional + Nationwide Turnkey Solutions</div>
+      </div>
+      <div class="card-body">
+        <div class="banner banner-info" style="margin-bottom:22px;">
+          <span class="banner-icon">ℹ️</span>
+          <div>Regional builders offer local code knowledge and hands-on project management. Nationwide <strong>"shake and bake"</strong> providers ship pre-engineered kit systems that can go from land to ribbon-cutting in as little as 90–120 days for smaller facilities. Builder ratings based on Inside Self Storage (ISS) Best Builder Awards and industry reviews.</div>
+        </div>
+
+        <div class="section-head"><span class="section-head-line">📍 Top 3 Rated Regional Builders — KS / MO Market</span></div>
+
+        <div class="builder-grid">
+          <!-- MAR -->
+          <div class="builder-card top">
+            <div class="bc-head">
+              <div><div class="bc-name">MAR Building Solutions</div><div class="bc-loc">Kansas City, MO · Butler Manufacturing Partner</div></div>
+              <span class="rank-badge rank-1">#1 Local</span>
+            </div>
+            <div class="bc-body">
+              <div class="bc-stat">Founded: <b>2010 · Kansas City based</b></div>
+              <div class="bc-stat">Serves: <b>MO &amp; KS statewide</b></div>
+              <div class="bc-stat">Timeline: <b>4–8 months</b></div>
+              <div class="bc-stat">Est. $/sq ft: <b>$45–$75</b></div>
+              <div class="bc-tags">
+                <span class="bc-tag">Single-Story</span><span class="bc-tag">Climate-Control</span>
+                <span class="bc-tag">Boat/RV Canopy</span><span class="bc-tag">Butler Systems</span>
+              </div>
+              <div class="bc-why">💡 Only Kansas City-area Butler Builder with a deep self-storage focus. Reviews zoning &amp; codes <em>before</em> land purchase — a key advantage for first-time developers.</div>
+            </div>
+            <div class="bc-contact">
+              <div><div class="bc-ph">(816) 295-8000</div><div class="bc-web">marbuildingsolutions.com</div></div>
+              <span class="badge-pill badge-priv">KC-Based GC</span>
+            </div>
+          </div>
+
+          <!-- ARCO/Murray -->
+          <div class="builder-card">
+            <div class="bc-head">
+              <div><div class="bc-name">ARCO/Murray Design Build</div><div class="bc-loc">St. Louis, MO · ENR Top 400 Contractor</div></div>
+              <span class="rank-badge rank-2">#2 Regional</span>
+            </div>
+            <div class="bc-body">
+              <div class="bc-stat">Founded: <b>1992 · St. Louis HQ</b></div>
+              <div class="bc-stat">Serves: <b>Nationwide, Midwest focus</b></div>
+              <div class="bc-stat">Timeline: <b>6–14 months</b></div>
+              <div class="bc-stat">Est. $/sq ft: <b>$60–$110</b></div>
+              <div class="bc-tags">
+                <span class="bc-tag">Multi-Story</span><span class="bc-tag">Climate-Control</span>
+                <span class="bc-tag">Large-Scale</span><span class="bc-tag">Design-Build</span>
+              </div>
+              <div class="bc-why">💡 ENR Top 400 contractor. Best for medium-to-large or multi-story builds. Has built for CubeSmart, Guardian Storage, and U-Haul in the Midwest.</div>
+            </div>
+            <div class="bc-contact">
+              <div><div class="bc-ph">(314) 567-9000</div><div class="bc-web">arcomurray.com</div></div>
+              <span class="badge-pill badge-pub">National GC</span>
+            </div>
+          </div>
+
+          <!-- Koehn -->
+          <div class="builder-card">
+            <div class="bc-head">
+              <div><div class="bc-name">Koehn Building Systems</div><div class="bc-loc">Rich Hill, MO · Metal Building Specialists</div></div>
+              <span class="rank-badge rank-3">#3 Regional</span>
+            </div>
+            <div class="bc-body">
+              <div class="bc-stat">Serves: <b>MO, KS, NE, IA, OK, AR</b></div>
+              <div class="bc-stat">Timeline: <b>3–6 months</b></div>
+              <div class="bc-stat">Est. $/sq ft: <b>$35–$60</b></div>
+              <div class="bc-tags">
+                <span class="bc-tag">Metal Kits</span><span class="bc-tag">Climate Units</span>
+                <span class="bc-tag">RV/Boat Canopy</span><span class="bc-tag">Own Concrete Crew</span>
+              </div>
+              <div class="bc-why">💡 Best budget option for a first-time small-to-medium facility in KS/MO. Handles their own concrete foundations and steel erection across all 6 regional states.</div>
+            </div>
+            <div class="bc-contact">
+              <div><div class="bc-ph">(417) 395-4305</div><div class="bc-web">koehnbuildings.com</div></div>
+              <span class="badge-pill badge-priv">Regional Metal</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-head" style="margin-top:8px;"><span class="section-head-line">🚀 Nationwide "Shake &amp; Bake" Turnkey Solutions</span></div>
+        <div style="font-size:14px;font-weight:600;color:var(--muted);margin-bottom:18px;line-height:1.6;">Pre-engineered kit systems shipped anywhere in the US and erected quickly by local crews — dramatically compressed timelines. Perfect for first-time owners who want a proven, repeatable system with minimal guesswork.</div>
+
+        <div class="turnkey-grid">
+          <!-- MakoRabco -->
+          <div class="tk-card">
+            <div class="tk-head">
+              <div><div class="tk-name">MakoRabco</div><div style="font-size:12px;font-weight:700;color:var(--muted2);">Carlsbad, CA &amp; Winter Garden, FL · Nationwide</div></div>
+              <span class="tk-award">🏆 ISS Best Builder × 10</span>
+            </div>
+            <div class="tk-body">
+              <div class="tk-grid">
+                <div class="tk-kv"><div class="tk-k">Experience</div><div class="tk-v">30+ yrs · 4,000+ facilities</div></div>
+                <div class="tk-kv"><div class="tk-k">Coverage</div><div class="tk-v">All 50 states</div></div>
+                <div class="tk-kv"><div class="tk-k">Build Types</div><div class="tk-v">Single/multi-story, climate, boat/RV, conversions</div></div>
+                <div class="tk-kv"><div class="tk-k">Timeline</div><div class="tk-v" style="color:var(--green-dark);">90–150 days</div></div>
+              </div>
+              <div class="bc-tags" style="margin-bottom:14px;">
+                <span class="bc-tag">Design-Build</span><span class="bc-tag">PE-Stamped Engineering</span>
+                <span class="bc-tag">Trachte Partner</span><span class="bc-tag">Boat/RV Canopy</span>
+              </div>
+              <div class="tk-how">🔧 <strong>How "shake &amp; bake" works:</strong> MakoRabco designs your layout, engineers all structural drawings (PE-stamped for your state), fabricates the metal building kit, ships it to your site, and coordinates local erection crews. You handle the concrete pad — they handle everything else. First-time owners receive guidance from concept through grand opening.</div>
+            </div>
+            <div class="tk-foot">
+              <div><div class="tk-ph">833-MAKO4ME</div><div style="font-size:11px;font-weight:700;color:var(--muted2);">(833-625-6463)</div></div>
+              <div><div class="tk-web">makorabco.com</div><div style="font-size:11px;font-weight:600;color:var(--muted2);">Free quote available</div></div>
+            </div>
+          </div>
+
+          <!-- Trachte -->
+          <div class="tk-card">
+            <div class="tk-head" style="background:linear-gradient(135deg, var(--blue-pale), var(--white));">
+              <div><div class="tk-name">Trachte Building Systems</div><div style="font-size:12px;font-weight:700;color:var(--muted2);">Sun Prairie, WI · US &amp; Canada · Since 1893</div></div>
+              <span class="tk-award" style="background:var(--blue);box-shadow:0 2px 0 var(--blue-dark);">🏭 130+ Years</span>
+            </div>
+            <div class="tk-body">
+              <div class="tk-grid">
+                <div class="tk-kv"><div class="tk-k">Experience</div><div class="tk-v">130+ years manufacturing</div></div>
+                <div class="tk-kv"><div class="tk-k">Coverage</div><div class="tk-v">US &amp; Canada dealer network</div></div>
+                <div class="tk-kv"><div class="tk-k">Build Types</div><div class="tk-v">Drive-up, multi-story, climate hallway, conversions</div></div>
+                <div class="tk-kv"><div class="tk-k">Timeline</div><div class="tk-v" style="color:var(--blue-dark);">60–120 days kit delivery</div></div>
+              </div>
+              <div class="bc-tags" style="margin-bottom:14px;">
+                <span class="bc-tag">Steel Kit Systems</span><span class="bc-tag">Hallway Systems</span>
+                <span class="bc-tag">Roll-Up Door Mfg.</span><span class="bc-tag">Interior Partitions</span>
+              </div>
+              <div class="tk-how" style="background:var(--blue-pale);border-color:#AADBF5;color:#0B4F6E;">🔧 <strong>How "shake &amp; bake" works:</strong> Trachte manufactures the complete building system — framing, wall panels, roofing, hallway systems, and Trac-Rite roll-up doors — all pre-cut and numbered for fast field assembly. Your local GC bolts it together like a giant kit. Factory-direct = lower material costs and tight dimensional tolerances.</div>
+            </div>
+            <div class="tk-foot">
+              <div><div class="tk-ph">(800) 356-5824</div><div style="font-size:11px;font-weight:700;color:var(--muted2);">Sun Prairie, WI HQ</div></div>
+              <div><div class="tk-web">trachte.com</div><div style="font-size:11px;font-weight:600;color:var(--muted2);">Dealer locator available</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison table -->
+        <div class="section-head" style="margin-top:28px;"><span class="section-head-line">📊 Quick Builder Comparison</span></div>
+        <div class="tbl-wrap" style="margin-bottom:0;">
+          <table class="tbl" style="min-width:auto;">
+            <thead>
+              <tr><th>Builder</th><th>Type</th><th>Best For</th><th>Timeline</th><th>Est. $/sq ft</th><th>Coverage</th><th>Phone</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><div class="biz-name">MAR Building Solutions</div><div class="biz-addr">Kansas City, MO</div></td><td><span class="badge-pill badge-priv">Regional GC</span></td><td>Small–Large · New dev · Zoning help</td><td class="price-cell">4–8 mo</td><td class="price-cell">$45–$75</td><td>MO &amp; KS</td><td class="broker-ph">(816) 295-8000</td></tr>
+              <tr><td><div class="biz-name">ARCO/Murray Design Build</div><div class="biz-addr">St. Louis, MO</div></td><td><span class="badge-pill badge-pub">National GC</span></td><td>Large · Multi-story · REIT-grade</td><td class="price-cell">6–14 mo</td><td class="price-cell">$60–$110</td><td>Nationwide</td><td class="broker-ph">(314) 567-9000</td></tr>
+              <tr><td><div class="biz-name">Koehn Building Systems</div><div class="biz-addr">Rich Hill, MO</div></td><td><span class="badge-pill badge-priv">Regional Metal</span></td><td>Small–Med · Budget-friendly</td><td class="price-cell">3–6 mo</td><td class="price-cell">$35–$60</td><td>MO/KS/NE/IA</td><td class="broker-ph">(417) 395-4305</td></tr>
+              <tr style="background:var(--green-bg);"><td><div class="biz-name" style="color:var(--green-dark);">MakoRabco 🏆</div><div class="biz-addr">Carlsbad, CA</div></td><td><span class="badge-pill badge-priv">Turnkey Kit</span></td><td>All sizes · First-timer friendly</td><td class="price-cell">90–150 days</td><td class="price-cell">$40–$80</td><td>All 50 states</td><td class="broker-ph">833-625-6463</td></tr>
+              <tr style="background:var(--blue-pale);"><td><div class="biz-name" style="color:var(--blue-dark);">Trachte Building Systems</div><div class="biz-addr">Sun Prairie, WI</div></td><td><span class="badge-pill badge-pub">Kit Manufacturer</span></td><td>All sizes · Lowest material cost</td><td class="price-cell">60–120 days</td><td class="price-cell">$30–$65</td><td>US &amp; Canada</td><td class="broker-ph">(800) 356-5824</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goToStep(2)">← Back to Review</button>
+      <button class="btn btn-primary" onclick="goToStep(4)">Proceed to Site Selection →</button>
+    </div>
+  </div>
+
+</div>
+<div class="footer-bar">
+  <div class="footer-step"><div class="footer-name">Step 3: Advisory</div><div class="footer-desc">Market intelligence · ZIP 66048 · 10-mile radius</div></div>
+  <div class="footer-btns">
+    <button class="btn btn-ghost" onclick="goToStep(2)">← Back</button>
+    <button class="btn btn-primary" id="advNext" onclick="goToStep(4)" style="display:none;">Next: Site Selection →</button>
+  </div>
+</div>
+</div>
+
+<!-- =================== STEPS 4–6 =================== -->
+<div class="view" id="view-4">
+<div class="main">
+  <div class="card"><div class="card-header"><div class="card-title">🏆 Selection <span class="chip">Coming Soon</span></div></div>
+  <div class="placeholder-body">
+    <span class="placeholder-icon">🏗️</span>
+    <div class="placeholder-h" style="color:var(--green);">Step 4: Site Selection</div>
+    <div class="placeholder-p">Identify and evaluate specific parcels of land or acquisition targets. Includes parcel maps, zoning data, and comparative scoring.</div>
+    <button class="btn btn-primary" onclick="goToStep(3)">← Return to Advisory</button>
+  </div></div>
+</div>
+<div class="footer-bar"><div class="footer-step"><div class="footer-name">Step 4: Selection</div></div><div class="footer-btns"><button class="btn btn-ghost" onclick="goToStep(3)">← Back</button><button class="btn btn-primary" onclick="goToStep(5)">Next →</button></div></div>
+</div>
+
+<div class="view" id="view-5">
+<div class="main">
+  <div class="card"><div class="card-header"><div class="card-title">📊 Business Plan <span class="chip">Coming Soon</span></div></div>
+  <div class="placeholder-body">
+    <span class="placeholder-icon">📈</span>
+    <div class="placeholder-h" style="color:var(--green);">Step 5: Business Plan</div>
+    <div class="placeholder-p">AI-generated financial projections, NOI forecasts, break-even analysis, and a full investor-ready business plan document.</div>
+    <button class="btn btn-primary" onclick="goToStep(4)">← Return to Selection</button>
+  </div></div>
+</div>
+<div class="footer-bar"><div class="footer-step"><div class="footer-name">Step 5: Business Plan</div></div><div class="footer-btns"><button class="btn btn-ghost" onclick="goToStep(4)">← Back</button><button class="btn btn-primary" onclick="goToStep(6)">Next →</button></div></div>
+</div>
+
+<div class="view" id="view-6">
+<div class="main">
+  <div class="card"><div class="card-header"><div class="card-title">🔗 Resources <span class="chip">Coming Soon</span></div></div>
+  <div class="placeholder-body">
+    <span class="placeholder-icon">🤝</span>
+    <div class="placeholder-h" style="color:var(--green);">Step 6: Resource Identification</div>
+    <div class="placeholder-p">Connect with vetted contractors, architects, attorneys, accountants, lenders, and operators who specialize in self-storage development in your region.</div>
+    <button class="btn btn-primary" onclick="goToStep(5)">← Return to Business Plan</button>
+  </div></div>
+</div>
+<div class="footer-bar"><div class="footer-step"><div class="footer-name">Step 6: Resources</div></div><div class="footer-btns"><button class="btn btn-ghost" onclick="goToStep(5)">← Back</button><button class="btn btn-primary" style="background:var(--green-dark);">🚀 Launch Full App</button></div></div>
+</div>
+
+<script>
+let curStep=1, unlocked=1;
+
+function goToStep(n){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+n).classList.add('active');
+  for(let i=1;i<=6;i++){
+    const tab=document.getElementById('step-tab-'+i);
+    const bub=document.getElementById('step-bub-'+i);
+    tab.className='step';
+    if(i===n){ tab.classList.add('active'); }
+    else if(i<n){ tab.classList.add('done'); bub.textContent='✓'; }
+    else if(i>unlocked+1){ tab.classList.add('locked'); }
+    if(i>=n && i<=unlocked+1){ /* unlocked */ }
+  }
+  curStep=n;
+  if(n>unlocked) unlocked=n;
+  if(n===2) fillReview();
+  if(n===3) runScan();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function num(id){ return parseFloat((document.getElementById(id)?.value||'0').replace(/,/g,''))||0; }
+function fmt(v){
+  if(v>=1e6) return '$'+(v/1e6).toFixed(1)+'M';
+  if(v>=1000) return '$'+(v/1000).toFixed(0)+'K';
+  return '$'+v.toLocaleString();
+}
+
+function updateFin(){
+  const c=num('f_cash'),l=num('f_liquid'),s=num('f_secondary'),b=num('f_borrow');
+  document.getElementById('fin_cl').textContent=fmt(c+l);
+  document.getElementById('fin_sec').textContent=fmt(c+l+s);
+  document.getElementById('fin_tot').textContent=fmt(c+l+s+b);
+  document.getElementById('fin_bor').textContent=fmt(b);
+}
+
+function updateCredit(){
+  const sc=parseInt(document.getElementById('f_credit').value);
+  if(!sc||sc<300||sc>850) return;
+  document.getElementById('scoreNum').textContent=sc;
+  const pct=((sc-300)/550)*100;
+  document.getElementById('scoreBar').style.setProperty('--pct',pct+'%');
+  let lbl='Poor';
+  if(sc>=800) lbl='Exceptional';
+  else if(sc>=740) lbl='Very Good';
+  else if(sc>=670) lbl='Good';
+  else if(sc>=580) lbl='Fair';
+  document.getElementById('scoreLbl').textContent=lbl;
+}
+
+function selCard(el,grp){
+  el.closest('.scale-grid').querySelectorAll('.scale-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function toggleCb(el){
+  el.classList.toggle('on');
+  el.querySelector('.cb-box').textContent=el.classList.contains('on')?'✓':'';
+}
+
+function togglePhase(){
+  const t=document.getElementById('phaseToggle');
+  const l=document.getElementById('phaseList');
+  t.classList.toggle('on');
+  l.style.display=t.classList.contains('on')?'block':'none';
+}
+
+function updateRadius(){
+  const mi=document.getElementById('f_miles').value;
+  const zip=document.getElementById('f_zip').value||'—';
+  document.getElementById('miles_cur').textContent=mi+' mi';
+  document.getElementById('radLbl').textContent='📍 '+mi+' Mile Radius';
+  document.getElementById('rad_pr').textContent=mi+' miles';
+  document.getElementById('zip_pr').textContent=zip;
+  const area=Math.round(Math.PI*mi*mi);
+  document.getElementById('area_pr').textContent='~'+area.toLocaleString()+' sq mi';
+  const sc=mi/20;
+  document.getElementById('ring1').style.cssText=`width:${140*sc+20}px;height:${140*sc+20}px;`;
+  document.getElementById('ring2').style.cssText=`width:${80*sc+20}px;height:${80*sc+20}px;`;
+  document.getElementById('ring3').style.cssText=`width:${40*sc+10}px;height:${40*sc+10}px;`;
+}
+
+document.getElementById('f_zip').addEventListener('input',function(){
+  document.getElementById('zip_pr').textContent=this.value||'—';
+});
+
+function fillReview(){
+  const fn=document.getElementById('f_fname').value;
+  const ln=document.getElementById('f_lname').value;
+  const name=[fn,ln].filter(Boolean).join(' ')||'Not provided';
+  setRv('rv_name',name);
+  setRv('rv_email',document.getElementById('f_email').value||'Not provided');
+  setRv('rv_phone',document.getElementById('f_phone').value||'Not provided');
+  document.getElementById('rv_cash').textContent=fmt(num('f_cash'));
+  document.getElementById('rv_liquid').textContent=fmt(num('f_liquid'));
+  document.getElementById('rv_secondary').textContent=fmt(num('f_secondary'));
+  document.getElementById('rv_borrow').textContent=fmt(num('f_borrow'));
+  document.getElementById('rv_rate').textContent=document.getElementById('f_rate').value+'%';
+  const cr=document.getElementById('f_credit').value;
+  setRv('rv_credit',cr?cr+' ('+creditLbl(parseInt(cr))+')':'Not provided');
+  document.getElementById('rv_zip').textContent=document.getElementById('f_zip').value||'66048';
+  const mi=document.getElementById('f_miles').value||'10';
+  document.getElementById('rv_miles').textContent=mi+' miles';
+  document.getElementById('rv_area').textContent='~'+Math.round(Math.PI*mi*mi).toLocaleString()+' sq miles';
+  const sc=document.querySelector('#view-1 .scale-card.sel .sc-name');
+  const sr=document.querySelector('#view-1 .scale-card.sel .sc-range');
+  if(sc) document.getElementById('rv_scale').textContent=sc.textContent+' ('+sr?.textContent+')';
+  const cnt=document.querySelectorAll('#view-1 .cb-item.on').length;
+  document.getElementById('rv_units').textContent=cnt+' selected';
+}
+
+function setRv(id,val){
+  const el=document.getElementById(id);
+  if(!el) return;
+  if(!val||val==='Not provided'){el.textContent='Not provided';el.className='rv-val na';}
+  else{el.textContent=val;el.className='rv-val';}
+}
+function creditLbl(s){
+  if(s>=800) return'Exceptional';
+  if(s>=740) return'Very Good';
+  if(s>=670) return'Good';
+  if(s>=580) return'Fair';
+  return'Poor';
+}
+
+let scanDone=false;
+function runScan(){
+  if(scanDone) return;
+  const dots=document.querySelectorAll('#scanList .scan-dot');
+  const rows=document.querySelectorAll('#scanList .scan-row');
+  const bar=document.getElementById('scanBar');
+  const msg=document.getElementById('scanMsg');
+  const status=document.getElementById('scanStatus');
+  const res=document.getElementById('results');
+  const nxt=document.getElementById('advNext');
+  const msgs=['Locating businesses…','Fetching website pricing…','Pulling county tax records…','Querying KS SOS…','Checking REIT filings…','Retrieving cap rates & NOI…','Compiling brokers & USDA FSA…'];
+  dots.forEach((d,i)=>{ d.className='scan-dot'; d.className+=i===0?' running':' waiting'; });
+  bar.style.width='0%';
+  res.style.display='none'; nxt.style.display='none';
+  status.textContent='— scanning…';
+  let step=0;
+  const iv=setInterval(()=>{
+    if(step>0){ dots[step-1].className='scan-dot done'; rows[step-1].classList.add('done-row'); }
+    if(step<dots.length){
+      dots[step].className='scan-dot running';
+      bar.style.width=Math.round(((step+1)/dots.length)*100)+'%';
+      msg.textContent=msgs[step];
+      status.textContent='— '+msgs[step];
+      step++;
+    } else {
+      clearInterval(iv);
+      bar.style.width='100%';
+      status.textContent='— ✅ Complete!';
+      msg.textContent='Scan complete — results ready below.';
+      scanDone=true;
+      setTimeout(()=>{
+        res.style.display='block';
+        nxt.style.display='inline-flex';
+        res.scrollIntoView({behavior:'smooth',block:'start'});
+      },500);
+    }
+  },850);
+}
+
+// init
+updateRadius();
+updateFin();
+</script>
+</body>
+</html>
